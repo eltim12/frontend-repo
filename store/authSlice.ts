@@ -1,7 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
-  user: { uid: string; email: string | null; displayName: string | null; accessToken: string; providerData: any[] } | null;
+  user: {
+    numberOfRents: ReactNode; uid: string; email: string | null; displayName: string | null; accessToken: string; providerData: any[] 
+} | null;
   loading: boolean;
   error: string | null;
 }
@@ -21,12 +23,11 @@ const authSlice = createSlice({
       state.error = null;
     },
     loginSuccess: (state, action: PayloadAction<AuthState["user"]>) => {
-      // console.log("✅ Serialized Payload →", action.payload);
       state.user = action.payload;
       state.loading = false;
       state.error = null;
     },
-    updateUserEmail: (state, action: PayloadAction<string>) => {
+    updateUserName: (state, action: PayloadAction<string>) => {
       if (state.user) {
         state.user.email = action.payload;
       }
@@ -41,5 +42,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginStart, loginSuccess, updateUserEmail, loginFailure, logout } = authSlice.actions;
+export const { loginStart, loginSuccess, updateUserName, loginFailure, logout } = authSlice.actions;
 export default authSlice.reducer;

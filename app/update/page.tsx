@@ -3,21 +3,22 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { updateEmail } from "firebase/auth";
 import { auth } from "@/apis/user";
-import { updateUserEmail } from "@/store/authSlice";
+import { updateUserName } from "@/store/authSlice";
 import { RootState } from "@/store/store";
 import { TextField, Button, Container, Typography, Alert } from "@mui/material";
+import axios from 'axios'
 
-const EditEmailPage = () => {
+const EditNamePage = () => {
   const user = useSelector((state: RootState) => state.auth.user);
-  const [email, setEmail] = useState(user?.email || "");
+  // const [name, setName] = useState(user?.name || "");
+  const [name, setName] = useState(user?.name || "");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const handleEmailUpdate = async () => {
+  const handleNameUpdate = async () => {
     setError(null);
     setSuccess(false);
 
@@ -27,38 +28,52 @@ const EditEmailPage = () => {
     }
 
     try {
-      await updateEmail(auth.currentUser, email);
-      dispatch(updateUserEmail(email)); // Update Redux state
+      await updateUserName(auth.currentUser, name);
+      dispatch(updateUserName(name)); 
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API}/api/update-user-data`,
+        { name },
+        {
+          headers: {
+            Authorization: `Bearer ${auth.currentUser.accessToken}`, // Include token in headers
+            "Content-Type": "application/json",
+          },
+        }
+      );
       setSuccess(true);
       
       setTimeout(() => {
-        router.push("/main"); // Redirect after update
+        router.push("/");
       }, 1500);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
     }
   };
 
   return (
     <Container maxWidth="xs">
       <Typography variant="h4" align="center" gutterBottom>
-        Edit Email
+        Edit data
       </Typography>
       {error && <Alert severity="error">{error}</Alert>}
-      {success && <Alert severity="success">Email updated successfully!</Alert>}
+      {success && <Alert severity="success">Name updated successfully!</Alert>}
       <TextField
         fullWidth
-        label="New Email"
+        label="New name"
         margin="normal"
         variant="outlined"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
-      <Button fullWidth variant="contained" color="primary" onClick={handleEmailUpdate}>
-        Update Email
+      <Button fullWidth variant="contained" color="primary" onClick={handleNameUpdate}>
+        Update name
       </Button>
     </Container>
   );
 };
 
-export default EditEmailPage;
+export default EditNamePage;

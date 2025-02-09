@@ -6,11 +6,13 @@ import { useDispatch } from "react-redux";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/apis/user";
 import { loginStart, loginSuccess, loginFailure } from "@/store/authSlice";
-import { TextField, Button, Container, Typography } from "@mui/material";
+import { TextField, Button, Container, Typography, Alert } from "@mui/material";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -18,11 +20,29 @@ const LoginPage = () => {
     dispatch(loginStart());
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      dispatch(loginSuccess(userCredential.user));
-      router.push("/"); 
+      if (userCredential) {
+        const user = userCredential.user;
+        const accessToken = await user.getIdToken(); 
 
-    } catch (error: any) {
-      dispatch(loginFailure(error.message));
+        dispatch(
+          loginSuccess({
+            uid: user.uid,
+            email: user.email,
+            accessToken,
+            providerData: [],
+            displayName: null
+          })
+        );
+        setSuccess(true);
+        router.push("/");
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError("email / password wrong.");
+        dispatch(loginFailure(error.message));
+      } else {
+        dispatch(loginFailure("email / password wrong."));
+      }
     }
   };
 
@@ -31,6 +51,9 @@ const LoginPage = () => {
       <Typography variant="h4" align="center" gutterBottom>
         Login
       </Typography>
+
+      {error && <Alert severity="error">{error}</Alert>}
+      {success && <Alert severity="success">login success!</Alert>}
       <TextField
         fullWidth
         label="Email"
