@@ -19,7 +19,7 @@ const MainPage = () => {
 
   useEffect(() => {
     if (!user) {
-      router.push("/login"); // Redirect to login if no user is found
+      router.push("/login");
     }
   }, [user, router]);
 
@@ -39,9 +39,8 @@ const MainPage = () => {
     const month = date.toLocaleString("en-US", { month: "short" });
     const year = date.getFullYear();
 
-    // Function to add suffix to day
     const getDaySuffix = (day) => {
-      if (day > 3 && day < 21) return "th"; // Covers 4th to 20th
+      if (day > 3 && day < 21) return "th";
       switch (day % 10) {
         case 1: return "st";
         case 2: return "nd";
@@ -62,7 +61,7 @@ const MainPage = () => {
     try {
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API}/api/fetch-user-data`, {
         headers: {
-          Authorization: `Bearer ${user.accessToken}`, // Include token in headers
+          Authorization: `Bearer ${user.accessToken}`,
         },
       });
       setUserData(response.data)

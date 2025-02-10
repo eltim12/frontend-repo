@@ -6,7 +6,6 @@ import { Button } from "@mui/material";
 
 export default function UpdateButton() {
 
-  // Corrected Redux state path
   const user = useSelector((state: RootState) => state.auth.user);
 
   const handleFetch = async () => {

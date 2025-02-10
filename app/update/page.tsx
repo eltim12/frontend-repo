@@ -11,7 +11,6 @@ import axios from 'axios'
 
 const EditNamePage = () => {
   const user = useSelector((state: RootState) => state.auth.user);
-  // const [name, setName] = useState(user?.name || "");
   const [name, setName] = useState(user?.name || "");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -35,7 +34,7 @@ const EditNamePage = () => {
         { name },
         {
           headers: {
-            Authorization: `Bearer ${auth.currentUser.accessToken}`, // Include token in headers
+            Authorization: `Bearer ${auth.currentUser.accessToken}`,
             "Content-Type": "application/json",
           },
         }
